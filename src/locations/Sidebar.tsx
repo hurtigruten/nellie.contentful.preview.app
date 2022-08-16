@@ -144,7 +144,7 @@ const Sidebar = () => {
         ))}
       </div>
       <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-        <FormLabel>Preview locally</FormLabel>
+        <FormLabel>Preview on localhost</FormLabel>
         <Checkbox
           onChange={() =>
             website === localhost
