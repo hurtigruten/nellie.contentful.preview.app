@@ -1,4 +1,7 @@
-This project was bootstrapped with [Create Contentful App](https://github.com/contentful/create-contentful-app).
+## TL;DR
+- Run app locally with `npm run start`
+- To deploy, use `npm run build; npm run upload`
+If you log in before running `upload`, you'll get an access token in your browser. 
 
 ## How to use
 
