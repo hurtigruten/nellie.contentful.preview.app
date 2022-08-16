@@ -15,9 +15,9 @@ import {
 } from "../util/locale";
 import { useState } from "react";
 
-type ContentType = "offerPage";
+type ContentType = "offerPage" | "destination";
+const validContentTypes: ContentType[] = ["offerPage", "destination"];
 
-const validContentTypes: ContentType[] = ["offerPage"];
 const isValidContentType = (contentType: any): contentType is ContentType =>
   validContentTypes.includes(contentType);
 
@@ -43,6 +43,9 @@ const getUrl = ({
   switch (contentType) {
     case "offerPage":
       path = "offers/";
+      break;
+    case "destination":
+      path = "destinations/";
       break;
     default:
       ((_: never) => _)(contentType);
