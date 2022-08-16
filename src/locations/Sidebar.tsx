@@ -15,8 +15,27 @@ import {
 } from "../util/locale";
 import { useState } from "react";
 
-type ContentType = "offerPage" | "destination";
-const validContentTypes: ContentType[] = ["offerPage", "destination"];
+type ContentType =
+  | "offerPage"
+  | "destination"
+  | "voyage"
+  | "ship"
+  | "excursion"
+  | "program"
+  | "inspirationArticle"
+  | "campaign"
+  | "campaignType2";
+const validContentTypes: ContentType[] = [
+  "offerPage",
+  "destination",
+  "voyage",
+  "ship",
+  "excursion",
+  "program",
+  "inspirationArticle",
+  "campaign",
+  "campaignType2",
+];
 
 const isValidContentType = (contentType: any): contentType is ContentType =>
   validContentTypes.includes(contentType);
@@ -46,6 +65,23 @@ const getUrl = ({
       break;
     case "destination":
       path = "destinations/";
+      break;
+    case "campaign":
+    case "campaignType2":
+      path = "campaigns/";
+      break;
+    case "voyage":
+      path = "cruises/";
+      break;
+    case "excursion":
+    case "program":
+      path = "enhance-your-cruise/catalog/";
+      break;
+    case "ship":
+      path = "ships/";
+      break;
+    case "inspirationArticle":
+      path = "stories/";
       break;
     default:
       ((_: never) => _)(contentType);
