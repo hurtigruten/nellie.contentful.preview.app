@@ -1,3 +1,4 @@
+export const baseLocale = "en";
 export const defaultUrlLocale = "en-au";
 
 export const enabledLocales: ContentfulLocale[] = [

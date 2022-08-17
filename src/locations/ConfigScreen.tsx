@@ -1,13 +1,26 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { AppExtensionSDK } from "@contentful/app-sdk";
-import { Heading, Form, Paragraph, Flex } from "@contentful/f36-components";
+import {
+  Heading,
+  Form,
+  Paragraph,
+  Flex,
+  FormLabel,
+  TextInput,
+} from "@contentful/f36-components";
 import { css } from "emotion";
 import { /* useCMA, */ useSDK } from "@contentful/react-apps-toolkit";
 
-export interface AppInstallationParameters {}
+export interface AppInstallationParameters {
+  targetWebsite?: string;
+  localhostPort?: number;
+}
 
 const ConfigScreen = () => {
-  const [parameters, setParameters] = useState<AppInstallationParameters>({});
+  const [parameters, setParameters] = useState<AppInstallationParameters>({
+    targetWebsite: "",
+    localhostPort: 3000,
+  });
   const sdk = useSDK<AppExtensionSDK>();
   /*
      To use the cma, inject it as follows.
@@ -67,6 +80,25 @@ const ConfigScreen = () => {
         <Paragraph>
           Adds a preview button for each active locale to entries
         </Paragraph>
+        <FormLabel>Target website</FormLabel>
+        <TextInput
+          value={parameters.targetWebsite}
+          placeholder="https://nellie-dev.azurewebsites.net"
+          onChange={(e) =>
+            setParameters({ ...parameters, targetWebsite: e.target.value })
+          }
+        />
+        <FormLabel>Localhost port</FormLabel>
+        <TextInput
+          value={parameters.localhostPort?.toString()}
+          placeholder="3000"
+          onChange={(e) =>
+            setParameters({
+              ...parameters,
+              localhostPort: Number(e.target.value),
+            })
+          }
+        />
       </Form>
     </Flex>
   );
