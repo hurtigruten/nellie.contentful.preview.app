@@ -7,19 +7,20 @@ import {
   Flex,
   FormLabel,
   TextInput,
+  EntityList,
+  MenuSectionTitle,
+  MenuItem,
+  Button,
 } from "@contentful/f36-components";
 import { css } from "emotion";
 import { /* useCMA, */ useSDK } from "@contentful/react-apps-toolkit";
-
-export interface AppInstallationParameters {
-  targetWebsite?: string;
-  localhostPort?: number;
-}
+import ContentTypeModal from "../components/ContentTypeModal";
 
 const ConfigScreen = () => {
   const [parameters, setParameters] = useState<AppInstallationParameters>({
-    targetWebsite: "",
+    urlPattern: "",
     localhostPort: 3000,
+    supportedContentTypes: [],
   });
   const sdk = useSDK<AppExtensionSDK>();
   /*
@@ -70,35 +71,127 @@ const ConfigScreen = () => {
     })();
   }, [sdk]);
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentContentType, setCurrentContentType] = useState<{
+    _id: number;
+    contentId: string;
+    path: string;
+  } | null>(null);
+
+  const openAddNewModal = () => {
+    setCurrentContentType(null);
+    setIsModalVisible(true);
+  };
+
+  const openEditModal = (ct: ContentTypeConfiguration) => {
+    setCurrentContentType(ct);
+    setIsModalVisible(true);
+  };
+
+  const deleteContentType = (id: number) =>
+    setParameters({
+      ...parameters,
+      supportedContentTypes:
+        parameters.supportedContentTypes?.filter(({ _id }) => _id !== id) ?? [],
+    });
+
+  const addOrEditContentType = (ct: InitialContentTypeConfiguration) => {
+    const isContentTypeAdded = currentContentType === null;
+    const oldContentTypes = isContentTypeAdded
+      ? parameters.supportedContentTypes ?? []
+      : parameters.supportedContentTypes?.filter(
+          ({ _id }) => _id !== currentContentType._id
+        ) ?? [];
+
+    const latestId =
+      Math.max(
+        ...(parameters.supportedContentTypes?.map(({ _id }) => _id) ?? [0])
+      ) + 1;
+    const _id = isContentTypeAdded ? latestId : currentContentType._id;
+    const newCt: ContentTypeConfiguration = { ...ct, _id };
+
+    setParameters({
+      ...parameters,
+      supportedContentTypes: [...oldContentTypes, newCt],
+    });
+    console.log([...oldContentTypes, newCt]);
+
+    setIsModalVisible(false);
+  };
+
   return (
     <Flex
       flexDirection="column"
       className={css({ margin: "80px", maxWidth: "800px" })}
     >
+      <ContentTypeModal
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        contentType={currentContentType}
+        onDone={addOrEditContentType}
+      />
       <Form>
-        <Heading>Localized preview</Heading>
-        <Paragraph>
-          Adds a preview button for each active locale to entries
-        </Paragraph>
-        <FormLabel>Target website</FormLabel>
-        <TextInput
-          value={parameters.targetWebsite}
-          placeholder="https://nellie-dev.azurewebsites.net"
-          onChange={(e) =>
-            setParameters({ ...parameters, targetWebsite: e.target.value })
-          }
-        />
-        <FormLabel>Localhost port</FormLabel>
-        <TextInput
-          value={parameters.localhostPort?.toString()}
-          placeholder="3000"
-          onChange={(e) =>
-            setParameters({
-              ...parameters,
-              localhostPort: Number(e.target.value),
-            })
-          }
-        />
+        <Flex flexDirection="column" gap="spacingS">
+          <Heading>Localized preview</Heading>
+          <Paragraph>
+            Adds a preview button for each active locale to entries
+          </Paragraph>
+          <FormLabel>Preview URL Pattern</FormLabel>
+          <TextInput
+            value={parameters.urlPattern}
+            placeholder="https://example.net/{locale}/{path}/{slug}"
+            onChange={(e) =>
+              setParameters({ ...parameters, urlPattern: e.target.value })
+            }
+          />
+          <Paragraph>
+            Variables you can use in pattern are: {"{locale}"},{"{contentPath}"}{" "}
+            and {"{slug}"}. For example:
+            {
+              "http://nellie-dev.azurewebsites.net/api/preview?secret=SECRET&slug=/{locale}/expeditions/{path}/{slug}"
+            }
+          </Paragraph>
+          <FormLabel>Localhost port</FormLabel>
+          <TextInput
+            value={parameters.localhostPort?.toString()}
+            placeholder="3000"
+            onChange={(e) =>
+              setParameters({
+                ...parameters,
+                localhostPort: Number(e.target.value),
+              })
+            }
+          />
+          <Flex flexDirection="column" gap="spacingS">
+            <FormLabel>Configure content types</FormLabel>
+            {!parameters.supportedContentTypes?.length && (
+              <Paragraph>No content types added (yet!)</Paragraph>
+            )}
+            {!!parameters.supportedContentTypes?.length && (
+              <EntityList>
+                {parameters.supportedContentTypes.map((ct) => (
+                  <EntityList.Item
+                    title={ct.contentId}
+                    description={`Path: ${ct.path}`}
+                    actions={[
+                      <MenuSectionTitle key="title">Actions</MenuSectionTitle>,
+                      <MenuItem onClick={() => openEditModal(ct)} key="edit">
+                        Edit
+                      </MenuItem>,
+                      <MenuItem
+                        onClick={() => deleteContentType(ct._id)}
+                        key="remove"
+                      >
+                        Remove
+                      </MenuItem>,
+                    ]}
+                  />
+                ))}
+              </EntityList>
+            )}
+            <Button onClick={openAddNewModal}>Add new content type</Button>
+          </Flex>
+        </Flex>
       </Form>
     </Flex>
   );
