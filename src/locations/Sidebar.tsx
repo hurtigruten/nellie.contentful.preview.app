@@ -14,31 +14,27 @@ import { useState } from "react";
 import { buildPreviewUrl } from "../util/buildPreviewUrl";
 import { isValidContentType } from "../util/typeguards/isValidContentType";
 import { getSlug } from "../util/getSlug";
+import { getPathForContentType } from "../util/getPathForContentType";
 
 const Sidebar = () => {
   const sdk = useSDK<SidebarExtensionSDK>();
-
-  const previewBaseUrl = sdk.parameters.installation["targetWebsite"] ?? "";
+  const appParameters: AppInstallationParameters = sdk.parameters.installation;
+  const previewBaseUrl = appParameters["targetWebsite"] ?? "";
   const localhostUrl = `http://localhost:${
-    sdk.parameters.installation["localhostPort"] ?? "3000"
+    appParameters["localhostPort"] ?? "3000"
   }`;
   const slugLocales = sdk.entry.fields["slug"].locales;
-  const numberOfPopulatedSlugs = slugLocales
-    .map((l) => sdk.entry.fields["slug"].getForLocale(l).getValue())
-    .filter(Boolean).length;
-  const slugHasLocalizedValues = numberOfPopulatedSlugs > 1;
 
   const [website, setWebsite] = useState(previewBaseUrl);
-  const [isFallbackEnabled, setIsFallbackEnabled] = useState(
-    !slugHasLocalizedValues
-  );
 
   const contentType = sdk.entry.getSys().contentType.sys.id;
-  if (!isValidContentType(contentType)) {
+  if (
+    !isValidContentType(contentType, appParameters["supportedContentTypes"])
+  ) {
     return (
       <Paragraph>
-        Localized preview app has not been configured for {contentType}. Please
-        contact a developer to enable it.
+        Localized preview app has not been configured for {contentType}. Go to
+        App Configuration to enable it.
       </Paragraph>
     );
   }
@@ -47,14 +43,6 @@ const Sidebar = () => {
   const previewLocales = enabledLocales.filter((locale) => {
     const firstFallbackLocale = getFallbackLocale(locale);
     const secondFallbackLocale = getFallbackLocale(firstFallbackLocale);
-
-    if (!isFallbackEnabled) {
-      return (
-        contentfulLocales.includes(locale) &&
-        slugLocales.includes(locale) &&
-        sdk.entry.fields["slug"].getForLocale(locale).getValue()
-      );
-    }
 
     const slugHasLocaleOrFallback =
       slugLocales.includes(locale) ||
@@ -68,7 +56,10 @@ const Sidebar = () => {
     .map((locale) =>
       buildPreviewUrl({
         locale,
-        contentType,
+        path: getPathForContentType(
+          contentType,
+          appParameters["supportedContentTypes"]
+        ),
         slug: getSlug(sdk, locale),
         website,
       })
@@ -107,13 +98,6 @@ const Sidebar = () => {
               ? setWebsite(previewBaseUrl)
               : setWebsite(localhostUrl)
           }
-        ></Checkbox>
-      </div>
-      <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-        <FormLabel>Use fallback for slug</FormLabel>
-        <Checkbox
-          isChecked={isFallbackEnabled}
-          onChange={() => setIsFallbackEnabled(!isFallbackEnabled)}
         ></Checkbox>
       </div>
     </>
