@@ -11,7 +11,6 @@ export const getSlug = (sdk: SidebarExtensionSDK, locale: ContentfulLocale) => {
 
   for (const locale_ of locales) {
     if (!sdk.entry.fields["slug"].locales.includes(locale_)) {
-      console.log("didnt find locale", locale_);
       continue;
     }
 

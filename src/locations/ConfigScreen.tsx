@@ -18,7 +18,7 @@ import ContentTypeModal from "../components/ContentTypeModal";
 
 const ConfigScreen = () => {
   const [parameters, setParameters] = useState<AppInstallationParameters>({
-    targetWebsite: "",
+    urlPattern: "",
     localhostPort: 3000,
     supportedContentTypes: [],
   });
@@ -136,14 +136,21 @@ const ConfigScreen = () => {
           <Paragraph>
             Adds a preview button for each active locale to entries
           </Paragraph>
-          <FormLabel>Target website</FormLabel>
+          <FormLabel>Preview URL Pattern</FormLabel>
           <TextInput
-            value={parameters.targetWebsite}
-            placeholder="https://nellie-dev.azurewebsites.net"
+            value={parameters.urlPattern}
+            placeholder="https://example.net/{locale}/{path}/{slug}"
             onChange={(e) =>
-              setParameters({ ...parameters, targetWebsite: e.target.value })
+              setParameters({ ...parameters, urlPattern: e.target.value })
             }
           />
+          <Paragraph>
+            Variables you can use in pattern are: {"{locale}"},{"{contentPath}"}{" "}
+            and {"{slug}"}. For example:
+            {
+              "http://nellie-dev.azurewebsites.net/api/preview?secret=SECRET&slug=/{locale}/expeditions/{path}/{slug}"
+            }
+          </Paragraph>
           <FormLabel>Localhost port</FormLabel>
           <TextInput
             value={parameters.localhostPort?.toString()}

@@ -1,5 +1,5 @@
 interface AppInstallationParameters {
-  targetWebsite?: string;
+  urlPattern?: string;
   localhostPort?: number;
   supportedContentTypes?: ContentTypeConfiguration[];
 }

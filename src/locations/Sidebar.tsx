@@ -18,14 +18,15 @@ import { getPathForContentType } from "../util/getPathForContentType";
 
 const Sidebar = () => {
   const sdk = useSDK<SidebarExtensionSDK>();
-  const appParameters: AppInstallationParameters = sdk.parameters.installation;
-  const previewBaseUrl = appParameters["targetWebsite"] ?? "";
-  const localhostUrl = `http://localhost:${
-    appParameters["localhostPort"] ?? "3000"
-  }`;
-  const slugLocales = sdk.entry.fields["slug"].locales;
+  const [useLocalhost, setUseLocalhost] = useState(false);
 
-  const [website, setWebsite] = useState(previewBaseUrl);
+  const appParameters: AppInstallationParameters = sdk.parameters.installation;
+  const urlPattern = appParameters["urlPattern"] ?? "";
+  const urlPatternForLocalhost = urlPattern.replace(
+    /.*\/\/[^\/]*/,
+    `http://localhost:${appParameters["localhostPort"] ?? 3000}`
+  );
+  const slugLocales = sdk.entry.fields["slug"].locales;
 
   const contentType = sdk.entry.getSys().contentType.sys.id;
   if (
@@ -61,7 +62,7 @@ const Sidebar = () => {
           appParameters["supportedContentTypes"]
         ),
         slug: getSlug(sdk, locale),
-        website,
+        urlPattern: useLocalhost ? urlPatternForLocalhost : urlPattern,
       })
     )
     .filter(Boolean);
@@ -69,16 +70,16 @@ const Sidebar = () => {
   return (
     <>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-        {!previewBaseUrl && (
+        {!urlPattern && (
           <NotificationItem variant="negative">
-            Preview website has not been configured.
+            Preview URL pattern has not been configured.
           </NotificationItem>
         )}
         {previewLocales.map((locale, i) => (
           <Button>
             <TextLink
               title={!previewUrls[i] ? "Missing slug" : "Preview"}
-              isDisabled={!previewBaseUrl || !previewUrls[i]}
+              isDisabled={!urlPattern || !previewUrls[i]}
               icon={<ExternalLinkIcon />}
               alignIcon="end"
               href={previewUrls[i] ?? ""}
@@ -93,11 +94,8 @@ const Sidebar = () => {
       <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
         <FormLabel>Preview on localhost</FormLabel>
         <Checkbox
-          onChange={() =>
-            website === localhostUrl
-              ? setWebsite(previewBaseUrl)
-              : setWebsite(localhostUrl)
-          }
+          isChecked={useLocalhost}
+          onChange={() => setUseLocalhost(!useLocalhost)}
         ></Checkbox>
       </div>
     </>

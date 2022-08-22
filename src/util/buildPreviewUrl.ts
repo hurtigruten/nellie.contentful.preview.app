@@ -4,18 +4,22 @@ export const buildPreviewUrl = ({
   locale,
   path,
   slug,
-  website,
+  urlPattern,
 }: {
   locale: ContentfulLocale;
   path: string | null;
   slug: string | null;
-  website: string;
+  urlPattern: string;
 }) => {
   if (!slug || !path) {
     return null;
   }
 
   const urlLocale = mapContentfulLocaleToUrlLocale(locale);
-  const baseUrl = `${website}/api/preview?secret=3C9D16D6739915329F4B12F5EEE6B&slug=/${urlLocale}/expeditions/`;
-  return `${baseUrl}${path}/${slug}`;
+  return urlPattern
+    .replace("{locale}", urlLocale)
+    .replace("{path}", path)
+    .replace("{slug}", slug);
 };
+
+// http://nellie-dev.azurewebsites.net/api/preview?secret=3C9D16D6739915329F4B12F5EEE6B&slug=/{locale}/expeditions/{path}/{slug}
