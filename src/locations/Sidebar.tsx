@@ -26,7 +26,6 @@ const Sidebar = () => {
     /.*\/\/[^\/]*/,
     `http://localhost:${appParameters["localhostPort"] ?? 3000}`
   );
-  const slugLocales = sdk.entry.fields["slug"].locales;
 
   const contentType = sdk.entry.getSys().contentType.sys.id;
   if (
@@ -40,6 +39,7 @@ const Sidebar = () => {
     );
   }
 
+  const slugLocales = sdk.entry.fields["slug"].locales;
   const contentfulLocales = sdk.locales.available;
   const previewLocales = enabledLocales.filter((locale) => {
     const firstFallbackLocale = getFallbackLocale(locale);

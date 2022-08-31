@@ -69,9 +69,7 @@ const ContentTypeModal = ({
               </div>
               <Flex flexDirection="row" gap="spacingM">
                 <Button
-                  isDisabled={
-                    !currentContentType?.contentId || !currentContentType?.path
-                  }
+                  isDisabled={!currentContentType?.contentId}
                   onClick={() => onDone(currentContentType!)}
                 >
                   {isAddModal ? "Add" : "Done"}
