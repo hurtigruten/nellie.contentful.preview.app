@@ -145,8 +145,8 @@ const ConfigScreen = () => {
             }
           />
           <Paragraph>
-            Variables you can use in pattern are: {"{locale}"},{"{contentPath}"}{" "}
-            and {"{slug}"}. For example:
+            Variables you can use in pattern are: <b>{"{locale}"}</b>,{" "}
+            <b>{"{path}"}</b> and <b>{"{slug}"}</b>. For example: <br />
             {
               "http://nellie-dev.azurewebsites.net/api/preview?secret=SECRET&slug=/{locale}/expeditions/{path}/{slug}"
             }
