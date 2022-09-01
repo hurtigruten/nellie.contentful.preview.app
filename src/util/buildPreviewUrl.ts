@@ -7,14 +7,10 @@ export const buildPreviewUrl = ({
   urlPattern,
 }: {
   locale: ContentfulLocale;
-  path: string | null;
-  slug: string | null;
+  path: string;
+  slug: string;
   urlPattern: string;
 }) => {
-  if (!slug || !path) {
-    return null;
-  }
-
   const urlLocale = mapContentfulLocaleToUrlLocale(locale);
   return urlPattern
     .replace("{locale}", urlLocale)

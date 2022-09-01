@@ -6,7 +6,7 @@ export const getPathForContentType = (
     (ct) => ct.contentId === contentTypeId
   );
   if (!contentTypeConfig) {
-    return null;
+    return "";
   }
   return contentTypeConfig.path;
 };
