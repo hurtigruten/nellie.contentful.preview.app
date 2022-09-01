@@ -39,7 +39,8 @@ const Sidebar = () => {
     );
   }
 
-  const slugLocales = sdk.entry.fields["slug"].locales;
+  const slugLocales = sdk.entry.fields["slug"]?.locales ?? [];
+  const isEntrySlugAvailable = !!sdk.entry.fields["slug"];
   const contentfulLocales = sdk.locales.available;
   const previewLocales = enabledLocales.filter((locale) => {
     const firstFallbackLocale = getFallbackLocale(locale);
@@ -50,18 +51,23 @@ const Sidebar = () => {
       slugLocales.includes(firstFallbackLocale) ||
       slugLocales.includes(secondFallbackLocale);
 
-    return contentfulLocales.includes(locale) && slugHasLocaleOrFallback;
+    return (
+      contentfulLocales.includes(locale) &&
+      (!isEntrySlugAvailable || slugHasLocaleOrFallback)
+    );
   });
+
+  const path = getPathForContentType(
+    contentType,
+    appParameters["supportedContentTypes"]
+  );
 
   const previewUrls = previewLocales
     .map((locale) =>
       buildPreviewUrl({
         locale,
-        path: getPathForContentType(
-          contentType,
-          appParameters["supportedContentTypes"]
-        ),
-        slug: getSlug(sdk, locale),
+        path,
+        slug: isEntrySlugAvailable ? getSlug(sdk, locale) : "",
         urlPattern: useLocalhost ? urlPatternForLocalhost : urlPattern,
       })
     )
